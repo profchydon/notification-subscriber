@@ -1,0 +1,34 @@
+version: '3'
+
+services: 
+  
+  subscriber:
+    build: 
+      context: .
+      dockerfile: ./subscriber.dockerfile
+    container_name: subscriber
+    ports: 
+      - 8001:8000
+    volumes: 
+      - ./:/app
+    depends_on:
+      - redis-server
+    networks: 
+      - subscriber-network
+
+  redis-server:
+    image: redis:6.0.12-alpine
+    container_name: redis-subscriber
+    restart: unless-stopped
+    tty: true
+    ports:
+      - 6370:6379
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./redisdata:/usr/local/etc/redis
+    networks: 
+      - subscriber-network
+
+networks: 
+  subscriber-network:
+    driver: bridge
